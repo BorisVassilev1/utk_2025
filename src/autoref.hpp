@@ -173,6 +173,7 @@ class Cloneable {
 template <class T>
 class SmartRef {
 	SmartRef(T *ref, bool isRef) : ref(ref), isRef(isRef) {}
+
    public:
 	SmartRef(T &ref) : ref(&ref), isRef(true) {}
 	SmartRef(T *ref) : ref(ref), isRef(false) {}
@@ -248,17 +249,17 @@ class SmartRef {
 
 	bool isRef;
 
-	template<class U>
+	template <class U>
 	friend class SmartRef;
 
    private:
 	T *ref;
 };
 
-
 template <class T>
 class SmartRefArr {
 	SmartRefArr(T *ref, bool isRef) : ref(ref), isRef(isRef) {}
+
    public:
 	SmartRefArr(T &ref) : ref(&ref), isRef(true) {}
 	SmartRefArr(T *ref) : ref(ref), isRef(false) {}
@@ -268,22 +269,21 @@ class SmartRefArr {
 		std::swap(isRef, ref.isRef);
 	}
 
-	SmartRefArr(const T* ref, std::size_t size)
-		: ref(new T[size]), isRef(false) {
-		for(std::size_t i = 0; i < size; ++i) {
+	SmartRefArr(const T *ref, std::size_t size) : ref(new T[size]), isRef(false) {
+		for (std::size_t i = 0; i < size; ++i) {
 			this->ref[i] = ref[i];
 		}
 	}
-//	SmartRefArr(T &&ref)
-//		requires(!std::is_abstract_v<T>)
-//		: ref(new T(std::move(ref))), isRef(false) {}
-//
-//	SmartRefArr(T &&ref)
-//		requires(std::is_abstract_v<T> && std::is_base_of_v<Cloneable, T>)
-//		: ref(ref.clone()), isRef(false) {}
+	//	SmartRefArr(T &&ref)
+	//		requires(!std::is_abstract_v<T>)
+	//		: ref(new T(std::move(ref))), isRef(false) {}
+	//
+	//	SmartRefArr(T &&ref)
+	//		requires(std::is_abstract_v<T> && std::is_base_of_v<Cloneable, T>)
+	//		: ref(ref.clone()), isRef(false) {}
 
 	~SmartRefArr() {
-		if (!isRef) { delete [] ref; }
+		if (!isRef) { delete[] ref; }
 	}
 
 	T		&operator*() { return *ref; }
@@ -343,11 +343,12 @@ class SmartRefArr {
 		return *this;
 	}
 
-	bool isRef;
-
-	template<class U>
+	template <class U>
 	friend class SmartRefArr;
 
    private:
 	T *ref;
+
+   public:
+	bool isRef;
 };

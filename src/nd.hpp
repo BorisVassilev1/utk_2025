@@ -58,7 +58,7 @@ struct gens<0, S...> {
 
 template <template <typename...> class Tup1, template <typename...> class Tup2, typename... A, typename... B,
 		  std::size_t... S>
-auto tuple_zip_helper(Tup1<A...> t1, Tup2<B...> t2, seq<S...> s)
+auto tuple_zip_helper(Tup1<A...> t1, Tup2<B...> t2, seq<S...>)
 	-> decltype(std::make_tuple(std::make_pair(std::get<S>(t1), std::get<S>(t2))...)) {
 	return std::make_tuple(std::make_pair(std::get<S>(t1), std::get<S>(t2))...);
 }
@@ -83,7 +83,6 @@ std::ostream &operator<<(std::ostream &out, const std::tuple<Args...> &t) {
 	}(std::make_index_sequence<std::tuple_size_v<std::tuple<Args...>>>{});
 	return out << ")";
 }
-
 
 template <typename T>
 struct type_t {};
@@ -132,7 +131,7 @@ class ND {
 		std::size_t N = sizeof...(Args);
 		bool		b = N == 2 && get<0>(dimensions) > 1;
 		if (b) out << std::endl;
-		for (std::size_t i = 0; i < get<0>(dimensions); ++i) {
+		for (int i = 0; i < get<0>(dimensions); ++i) {
 			if (i) out << ",";
 			if (i && b) out << std::endl;
 			(*this)[i].printInt(out, space);
@@ -145,10 +144,8 @@ class ND {
 	auto &operator=(T &&other)
 		requires(sizeof...(Args) > 0)
 	{
-		if (This().shape() != other.shape()) {
-			throw std::runtime_error("ND dimensions do not match");
-		}
-		for (std::size_t i = 0; i < get<0>(shape()); ++i) {
+		if (This().shape() != other.shape()) { throw std::runtime_error("ND dimensions do not match"); }
+		for (int i = 0; i < get<0>(shape()); ++i) {
 			This()[i] = other[i];
 		}
 		return This();
@@ -171,10 +168,36 @@ class ND {
 	}
 
 	template <class T>
+	auto &assign(T &&other) {
+		if (std::tuple_size_v<decltype(This().shape())> != std::tuple_size_v<decltype(other.shape())>) {
+			throw std::runtime_error("Dimensions count does not match!");
+		}
+		for (int i = 0; i < get<0>(shape()); ++i) {
+			This()[i].assign(other[i]);
+		}
+		return This();
+	}
+	template <class T>
+	auto &assign(const T &other)
+		requires(sizeof...(Args) == 0 && std::is_fundamental_v<T>)
+	{
+		This()[] = other;
+		return This();
+	}
+
+	template <class T>
+	Container &assign(T &&other)
+		requires(sizeof...(Args) == 0 && !std::is_fundamental_v<T>)
+	{
+		This()[] = other[];
+		return This();
+	}
+
+	template <class T>
 	ND<Container, Args...> &apply(T &&f)
 		requires(sizeof...(Args) > 0)
 	{
-		for (std::size_t i = 0; i < get<0>(shape()); ++i) {
+		for (int i = 0; i < get<0>(shape()); ++i) {
 			This()[i].apply(f);
 		}
 		return *this;
@@ -191,7 +214,7 @@ class ND {
 	auto apply2(T &&f, Arr &&arr)
 		requires(sizeof...(Args) > 0)
 	{
-		for (std::size_t i = 0; i < get<0>(shape()); ++i) {
+		for (int i = 0; i < get<0>(shape()); ++i) {
 			This()[i].apply2(std::forward<T>(f), arr[i]);
 		}
 		return *this;
@@ -237,7 +260,7 @@ class ND {
 	void serializeData(std::ostream &out)
 		requires(sizeof...(Args) > 0)
 	{
-		for (std::size_t i = 0; i < std::get<0>(shape()); ++i) {
+		for (int i = 0; i < std::get<0>(shape()); ++i) {
 			This()[i].serializeData(out);
 		}
 	}
@@ -266,13 +289,21 @@ class ND {
 		requires(sizeof...(Args) > 0)
 	{
 		if (shape() != other.shape()) { return false; }
-		for (std::size_t i = 0; i < std::get<0>(shape()); ++i) {
+		for (int i = 0; i < std::get<0>(shape()); ++i) {
 			if (!(This()[i].operator==(other[i]))) { return false; }
 		}
 		return true;
 	}
 
-	auto operator[](std::size_t index) { return This()[index]; }
-	auto operator[](Args... indices) { return This()[indices...]; }
+	auto operator[](int index)
+		requires(sizeof...(Args) > 0)
+	{
+		return This()[index];
+	}
+	auto operator[](Args... indices)
+		requires(sizeof...(indices) == sizeof...(Args) && sizeof...(indices) != 1)
+	{
+		return This()[indices...];
+	}
 	auto slice(std::size_t i, std::size_t j) { return This().slice(i, j); }
 };

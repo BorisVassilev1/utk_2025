@@ -23,8 +23,12 @@ class NDArray : public ND<NDArray<T, Args...>, Args...> {
 	NDArray &operator=(NDArray &other) { return Parent::operator=(other); }
 	NDArray &operator=(NDArray &&other) { return Parent::operator=(other); }
 	NDArray &operator=(const T &other) { return Parent::operator=(other); }
+	template <class U>
+	NDArray &operator=(U &&other) {return Parent::template operator=<U>(std::forward<U>(other));}
 
-	T &operator[](Args... indices) {
+	T &operator[](Args... indices)
+		requires(sizeof...(indices) == sizeof...(Args) && sizeof...(indices) != 1)
+	{
 		static_assert((std::is_integral_v<Args> && ...), "ND operator[] requires integral dimensions");
 
 		std::size_t			  index		 = offset;
@@ -51,7 +55,7 @@ class NDArray : public ND<NDArray<T, Args...>, Args...> {
 		return data[offset];
 	}
 
-	auto operator[](std::size_t index)
+	auto operator[](int index)
 		requires(sizeof...(Args) > 0)
 	{
 		std::tuple	t	   = pop_front(this->dimensions);
@@ -86,7 +90,7 @@ NDArray<T, Args...>::NDArray(std::tuple<Args...> dim, T *data, std::size_t offse
 };
 
 template <class T, class... Args>
-NDArray<T, Args...>::NDArray(std::tuple<Args...> dim, type_t<T> t)
+NDArray<T, Args...>::NDArray(std::tuple<Args...> dim, type_t<T>)
 	: Parent(dim), data(new T[Parent::size()]), offset(0) {
 	static_assert((std::is_integral_v<Args> && ...), "ND constructor requires integral dimensions");
 }
@@ -104,9 +108,10 @@ NDArray<T, Args...>::NDArray(std::tuple<Args...> dim, type_t<T>, std::istream &i
 	[&]<auto... p>(std::index_sequence<p...>) {
 		((in >> std::get<p>(this->dimensions)), ...);
 	}(std::make_index_sequence<sizeof...(Args)>{});
-	while(in.peek() == '%' || std::isspace(in.peek())) in.ignore();
+	while (in.peek() == '%' || std::isspace(in.peek()))
+		in.ignore();
 	data = new T[Parent::size()];
-	for(std::size_t i = 0; i < this->size(); ++i) {
+	for (std::size_t i = 0; i < this->size(); ++i) {
 		in >> data[i];
 	}
 }

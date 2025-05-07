@@ -14,13 +14,15 @@ class Slice : public ND<Slice<Container, Args...>, Args...> {
 	std::tuple<Args...> cap;
 
    public:
+	using Elem = std::remove_reference_t<Container>::Elem;
+
 	template <class U, class... Constraints>
 	Slice(U &&array, std::tuple<Args...>, std::tuple<Constraints...> c)
 		: Parent(sub_v(snd_v(c), fst_v(c))), data(std::forward<U>(array)), offset(fst_v(c)), cap(snd_v(c)) {
 		static_assert((std::is_integral_v<Args> && ...), "ND constructor requires integral dimensions");
 	}
 
-	auto operator[](std::size_t index)
+	auto operator[](int index)
 		requires(sizeof...(Args) > 0)
 	{
 		std::size_t i = index + get<0>(this->offset);
@@ -30,11 +32,17 @@ class Slice : public ND<Slice<Container, Args...>, Args...> {
 		return s;
 	}
 
-	auto &operator[](Args... indices) {
+	auto &operator[](Args... indices) 
+		requires(sizeof...(indices) == sizeof...(Args) && sizeof...(indices) != 1)
+	{
 		auto ind = add_v(std::forward_as_tuple(indices...), this->offset);
 		return [&]<size_t...p>(std::index_sequence<p...>) -> auto& {
 			return (*data)[(std::get<p>(ind))...];
 		}(std::make_index_sequence<sizeof...(Args)>());
+	}
+
+	operator Elem&() {
+		return data.get();
 	}
 
 	template <class... P>

@@ -14,7 +14,7 @@ inline auto hadamardPaley(int n) {
 	-a;
 
 	a[0] = 0;
-	for(std::size_t i = 1; i < p; ++i) {
+	for(int i = 1; i < p; ++i) {
 		a[(i * i) % p] = 1;
 	}
 	//a.print(std::cout);
@@ -23,8 +23,8 @@ inline auto hadamardPaley(int n) {
 	NDArray A = Ones((_, n,n), type<int>);
 
 	auto Q = Slice(A, A.shape(), (_, P{1,n}, P{1, n}));
-	for(std::size_t i = 0; i < p; ++i) {
-		for(std::size_t j = 0; j < p; ++j) {
+	for(int i = 0; i < p; ++i) {
+		for(int j = 0; j < p; ++j) {
 			Q[i][j] = rep[j - i];
 		}
 	}
@@ -41,8 +41,10 @@ inline Ones<int, int, int> hadamardSylvester(int n) {
 	auto A = Ones((_, n, n), type<int>);
 	
 	auto B = hadamardSylvester(n / 2);
-	auto _B = Cycle(B, B.shape());
-	A.apply2([](int x, int y) { return y; }, _B);
+	//auto _B = Cycle(B, B.shape());
+	//A.apply2([](int, int y) { return y; }, _B);
+	//assign(A, A.shape(), _B);
+	A.assign(Cycle(B, B.shape()));
 	-Slice(A, A.shape(), (_, P{n / 2, n}, P{n / 2, n}));
 
 	return A;

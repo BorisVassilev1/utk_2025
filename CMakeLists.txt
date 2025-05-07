@@ -17,8 +17,8 @@ file(GLOB_RECURSE FIGURES_SOURCES
 add_executable(main main.cpp ${FIGURES_SOURCES})
 set_target_properties(main PROPERTIES RUNTIME_OUTPUT_DIRECTORY ../)
 #target_compile_features(main PRIVATE cxx_std_23)
-target_compile_options(main PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline)
-target_link_options(main PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline)
+target_compile_options(main PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
+target_link_options(main PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
 target_include_directories(main PRIVATE src/)
 #target_include_directories(main PUBLIC ../lib/)
 
