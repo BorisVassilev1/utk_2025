@@ -320,7 +320,7 @@ class SmartRefArr {
 	}
 
 	SmartRefArr &operator=(T *ref) {
-		if (!isRef) { delete this->ref; }
+		if (!isRef) { delete [] this->ref; }
 		this->ref = ref;
 		isRef	  = false;
 		return *this;
@@ -328,7 +328,7 @@ class SmartRefArr {
 
 	SmartRefArr &operator=(SmartRefArr &ref) {
 		if (&ref == this->ref) return *this;
-		if (!isRef) { delete this->ref; }
+		if (!isRef) { delete [] this->ref; }
 		this->ref = ref.ref;
 		isRef	  = true;
 		return *this;
@@ -336,7 +336,7 @@ class SmartRefArr {
 
 	SmartRefArr &operator=(SmartRefArr &&ref) {
 		if (&ref == this->ref) return *this;
-		if (!isRef) { delete this->ref; }
+		if (!isRef) { delete [] this->ref; }
 		this->ref = ref.ref;
 		isRef	  = ref.isRef;
 		ref.isRef = true;

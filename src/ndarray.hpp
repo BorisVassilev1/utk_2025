@@ -27,6 +27,13 @@ class NDArray : public ND<NDArray<T, Args...>, Args...> {
 	template <class U>
 	NDArray &operator=(U &&other) {return Parent::template operator=<U>(std::forward<U>(other));}
 
+	NDArray &operator^=(NDArray &&other) {
+		data = std::move(other.data);
+		this->dimensions = other.dimensions;
+		offset = other.offset;
+		return *this;
+	}
+
 	T &operator[](Args... indices)
 		requires(sizeof...(indices) == sizeof...(Args) && sizeof...(indices) != 1)
 	{

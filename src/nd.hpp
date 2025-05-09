@@ -8,6 +8,11 @@
 
 #include <utils.hpp>
 
+template<class ...Args>
+struct t : std::tuple<Args...> {
+	t(Args &&... args) : std::tuple<Args...>(std::forward<Args>(args)...) {}
+};
+
 template <class... Args1, class... Args2>
 std::tuple<Args1..., Args2...> operator,(std::tuple<Args1...> t1, std::tuple<Args2...> t2) {
 	return std::tuple_cat(t1, t2);

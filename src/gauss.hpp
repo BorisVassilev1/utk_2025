@@ -3,6 +3,8 @@
 #include <tuple>
 #include <nd.hpp>
 #include <ndarray.hpp>
+#include <slice.hpp>
+#include <primitives.hpp>
 
 template<class U>
 void gaussSolve(U && A) {

@@ -11,6 +11,7 @@
 #include <hadamard.hpp>
 #include <gauss.hpp>
 #include <golay.hpp>
+#include "code.hpp"
 
 using P = std::pair<int, int>;
 
@@ -92,6 +93,11 @@ int main() {
 		NDArray G = Golay24();
 		G.print(std::cout);
 
+		{
+			std::ofstream os("golay24.txt");
+			G.serialize(os);
+		}
+
 		std::cout << std::boolalpha << "is G orthogonal to G? :" << isSelfOrthogonal(G) << std::endl;
 
 		auto H = orthogonal(G);
@@ -122,5 +128,19 @@ int main() {
 		K_orthogonal.print(std::cout);
 		CODE_INFO(K_orthogonal);
 
+	} {
+		std::ifstream in("codes/test.txt");
+		LinearCode c = in;
+		c.check.print(std::cout);
+		c.generator.print(std::cout);
+
+		{
+			std::ofstream out("codes/test_gen.txt");
+			c.serializeGenerator(out);
+		}
+		{
+			std::ofstream out("codes/test_check.txt");
+			c.serializeCheck(out);
+		}
 	}
 }
