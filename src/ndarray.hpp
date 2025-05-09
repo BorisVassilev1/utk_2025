@@ -1,4 +1,5 @@
 #pragma once
+#include <initializer_list>
 #include <iostream>
 #include <ostream>
 #include <tuple>
@@ -43,10 +44,11 @@ class NDArray : public ND<NDArray<T, Args...>, Args...> {
 		return data[index];
 	}
 
-	void print(std::ostream &out, int space = 2) {
+	auto &print(std::ostream &out, int space = 2) {
 		std::cout << "NDArray" << this->dimensions << std::endl;
 		this->printInt(out, space);
 		std::cout << std::endl;
+		return *this;
 	}
 
 	operator T &()

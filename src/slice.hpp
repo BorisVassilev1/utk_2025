@@ -72,10 +72,11 @@ class Slice : public ND<Slice<Container, Args...>, Args...> {
 		return a;
 	}
 
-	void print(std::ostream &out, int space = 2) {
+	auto &print(std::ostream &out, int space = 2) {
 		std::cout << "Slice" << this->dimensions << std::endl;
 		this->printInt(out, space);
 		std::cout << std::endl;
+		return *this;
 	}
 
 	using Parent::operator=;

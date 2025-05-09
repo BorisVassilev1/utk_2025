@@ -1,4 +1,5 @@
 #pragma once
+#include "autoref.hpp"
 #include "hadamard.hpp"
 #include "ndarray.hpp"
 #include "primitives.hpp"
@@ -34,6 +35,24 @@ int dot(A && a, B && b) {
 	return res;
 }
 
+/// [k] x [k, n] -> [n]
+template<class A, class M>
+auto vecMatMul(A && a, M && m) {
+	auto [k1] = a.shape();
+	auto [k2, n] = m.shape();
+	assert(k1 == k2 && "dimensions must match");
+	auto k = k1;
+	auto res = Zeros((_, n), type<int>);
+
+	auto exp1 = Zeros((_, n), type<int>);
+	for(int i = 0; i < k; ++i) {
+		exp1 = m[i];
+		exp1.multScalar(a[i]);
+		res += exp1;
+	}
+	return res;
+}
+
 template< class A>
 int w(A && a) {
 	int res = 0;
@@ -63,12 +82,38 @@ inline bool isSelfOrthogonal(V && v) {
 	return true;
 }
 
+template<class Arr>
+inline auto numToBoolVec(int n, Arr& arr) {
+	const int base = 2;
+	auto [len] = arr.shape();
+	for(int i = 0; i < len; ++i) {
+		arr[i] = n % base;
+		n /= base;
+	}
+}
+
+inline auto pow(int n, int k) {
+	int res = 1;
+	for(int i = 0; i < k; ++i) res *= n;
+	return res;
+}
+
 template<class G>
 inline int findDistance(G && g) {
-	int min = std::get<0>(g.shape());
-	for(int i = 0; i < std::get<0>(g.shape()); ++i) {
-		int d = w(g[i]);
-		min = std::min(min, d);
+
+	auto [k, n] = g.shape();
+	int K = pow(2, k);
+	auto coefs = Zeros((_, k), type<int>);
+		
+	int min = k;
+
+	for(int i = 0; i < K; ++i) {
+		numToBoolVec(i, coefs);
+		int weight = w(
+			vecMatMul(coefs, g).apply([](int x) {return x % 2;})
+			//.print(std::cout)
+		);
+		if(weight != 0) min = std::min(min, weight);
 	}
 	return min;
 }

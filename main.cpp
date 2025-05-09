@@ -6,10 +6,11 @@
 #include <ndarray.hpp>
 #include <primitives.hpp>
 #include <slice.hpp>
+#include <tuple>
 #include <utils.hpp>
 #include <hadamard.hpp>
 #include <gauss.hpp>
-#include "golay.hpp"
+#include <golay.hpp>
 
 using P = std::pair<int, int>;
 

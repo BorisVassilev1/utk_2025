@@ -104,7 +104,7 @@ class ND {
 		static_assert((std::is_integral_v<Args> && ...), "ND constructor requires integral dimensions");
 	}
 
-	void print(std::ostream &out, int space = 2) { This().print(out, space); }
+	auto &print(std::ostream &out, int space = 2) { return This().print(out, space); }
 
 	std::size_t			size() const { return size(dimensions); }
 	std::tuple<Args...> shape() const { return dimensions; }
@@ -214,6 +214,7 @@ class ND {
 	auto apply2(T &&f, Arr &&arr)
 		requires(sizeof...(Args) > 0)
 	{
+		static_assert(std::tuple_size<decltype(arr.shape())>() == sizeof...(Args));
 		for (int i = 0; i < get<0>(shape()); ++i) {
 			This()[i].apply2(std::forward<T>(f), arr[i]);
 		}
@@ -237,8 +238,18 @@ class ND {
 		return apply2(std::minus(), arr);
 	}
 
+	template <class RHS>
+	auto operator*=(RHS &&arr) {
+		return apply2(std::multiplies(), arr);
+	}
+
+	template <class RHS>
+	auto multScalar(RHS &&v) {
+		return apply([&v]<class T>(T &x) { return x * v; });
+	}
+
 	auto operator-() {
-		return apply([](int x) { return -x; });
+		return apply(std::negate());
 	}
 
 	template <class T>
