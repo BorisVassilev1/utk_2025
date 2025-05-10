@@ -97,6 +97,7 @@ inline type_t<T> type{};
 template <class Container, class... Args>
 class ND {
    public:
+	using Internal = Container;
    protected:
 	std::tuple<Args...> dimensions;
 
@@ -316,7 +317,7 @@ class ND {
 	{
 		return This()[index];
 	}
-	auto operator[](Args... indices)
+	auto &&operator[](Args... indices)
 		requires(sizeof...(indices) == sizeof...(Args) && sizeof...(indices) != 1)
 	{
 		return This()[indices...];

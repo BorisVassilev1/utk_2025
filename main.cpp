@@ -115,7 +115,7 @@ int main() {
 		}
 	}
 	{
-		std::ifstream in("P.txt");
+		std::ifstream in("K.txt");
 		NDArray		  K = NDArray((_, 1, 1), type<int>, in);
 		K.print(std::cout);
 
@@ -142,5 +142,9 @@ int main() {
 			std::ofstream out("codes/test_check.txt");
 			c.serializeCheck(out);
 		}
+
+		auto a = Eye<int>(c.blockLength(), 1);
+
+		c.encode(a).print(std::cout);
 	}
 }

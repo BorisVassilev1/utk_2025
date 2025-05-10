@@ -22,6 +22,23 @@ target_link_options(main PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inlin
 target_include_directories(main PRIVATE src/)
 #target_include_directories(main PUBLIC ../lib/)
 
+# Make encode application
+add_executable(encode encode.cpp ${FIGURES_SOURCES})
+set_target_properties(encode PROPERTIES RUNTIME_OUTPUT_DIRECTORY ../)
+#target_compile_features(encode PRIVATE cxx_std_23)
+target_compile_options(encode PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
+target_link_options(encode PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
+target_include_directories(encode PRIVATE src/)
+#target_include_directories(encode PUBLIC ../lib/)
+
+# Make decode application
+add_executable(decode decode.cpp ${FIGURES_SOURCES})
+set_target_properties(decode PROPERTIES RUNTIME_OUTPUT_DIRECTORY ../)
+#target_compile_features(decode PRIVATE cxx_std_23)
+target_compile_options(decode PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
+target_link_options(decode PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
+target_include_directories(decode PRIVATE src/)
+#target_include_directories(decode PUBLIC ../lib/)
 
 #SET(COVERAGE_FLAGS 
 #	--coverage

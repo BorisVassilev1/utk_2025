@@ -26,52 +26,6 @@ inline auto Golay24() {
 	return G;
 }
 
-template<class A, class B>
-int dot(A && a, B && b) {
-	int res = 0;
-	for(int i = 0; i < std::get<0>(a.shape()); ++i) {
-		res += a[i] * b[i];
-	}
-	return res;
-}
-
-/// [k] x [k, n] -> [n]
-template<class A, class M>
-auto vecMatMul(A && a, M && m) {
-	auto [k1] = a.shape();
-	auto [k2, n] = m.shape();
-	assert(k1 == k2 && "dimensions must match");
-	auto k = k1;
-	auto res = Zeros((_, n), type<int>);
-
-	auto exp1 = Zeros((_, n), type<int>);
-	for(int i = 0; i < k; ++i) {
-		exp1 = m[i];
-		exp1.multScalar(a[i]);
-		res += exp1;
-	}
-	return res;
-}
-
-template< class A>
-int w(A && a) {
-	int res = 0;
-	for(int i = 0; i < std::get<0>(a.shape()); ++i) {
-		res += a[i];
-	}
-	return res;
-}
-
-template<class V, class G>
-inline bool isSolution(V && v, G && g) {
-	for(int i = 0; i < std::get<0>(g.shape()); ++i) {
-		if(dot(g[i], v) % 2 != 0) {
-			return false;
-		}
-	}
-	return true;
-}
-
 template<class V>
 inline bool isSelfOrthogonal(V && v) {
 	for(int i = 0; i < std::get<0>(v.shape()); ++i) {
