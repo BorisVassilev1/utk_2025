@@ -258,7 +258,8 @@ class SmartRef {
 
 template <class T>
 class SmartRefArr {
-	SmartRefArr(T *ref, bool isRef) : ref(ref), isRef(isRef) {}
+private:
+	//SmartRefArr(T *ref, bool isRef) : ref(ref), isRef(isRef) {}
 
    public:
 	SmartRefArr(T &ref) : ref(&ref), isRef(true) {}

@@ -18,11 +18,11 @@ int main(int argc, char** argv) {
 		std::cerr << "only one argument needed" << std::endl;
 		exit(1);
 	}
-	code->generator.print(std::cout);
+	//code->generator.print(std::clog);
 	
 	int cnt = 0;
-	auto arr = NDArray((_, code->blockLength()), type<int>);
-	char c = '\0';
+	auto arr = Zeros((_, code->blockLength()), type<int>);
+	char c;
 	while((std::cin.get(c))) {
 		if(c == '0' || c == '1') {
 			arr[cnt] = c - '0'; 
@@ -30,10 +30,13 @@ int main(int argc, char** argv) {
 
 			if(cnt == code->blockLength()) {
 				auto res = code->encode(arr);
-				for(int i = 0; i < code->length(); ++i) {
-					std::cout << res[0][i];
-				}
+				for(int x : res[0]) std::cout << x;
 				std::cout << std::endl;
+				
+				std::clog << "sent: " << std::endl;
+				for(int x : res[0]) std::clog << x;
+				std::clog << std::endl;
+
 				cnt = 0;
 			}
 		}

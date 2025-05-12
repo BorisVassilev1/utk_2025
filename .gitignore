@@ -3,4 +3,5 @@ build/
 main
 decode
 encode
+noisy
 

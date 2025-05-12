@@ -19,25 +19,36 @@ int main(int argc, char** argv) {
 		std::cerr << "only one argument needed" << std::endl;
 		exit(1);
 	}
-	code->generator.print(std::cout);
+	code->generator.print(std::cerr);
 
 	SindromeDecoder decoder(*code);
 	
 	int cnt = 0;
-	auto arr = NDArray((_, code->blockLength()), type<int>);
+	auto arr = Zeros((_, code->length()), type<int>);
 	char c = '\0';
 	while((std::cin.get(c))) {
 		if(c == '0' || c == '1') {
 			arr[cnt] = c - '0'; 
 			++cnt;
 
-			if(cnt == code->blockLength()) {
-				//auto res = code->encode(arr);
-				//for(int i = 0; i < code->length(); ++i) {
-				//	std::cout << res[0][i];
-				//}
-				//std::cout << std::endl;
-				//cnt = 0;
+			if(cnt == code->length()) {
+				std::cerr << "received: " << std::endl;
+				for(int x : arr) std::cerr << x;
+
+				std::cerr << std::endl;
+				auto res = decoder.decode(arr);
+				if(res.size() == 0) {
+					std::cerr << "error" << std::endl;
+					cnt = 0;
+					continue;
+				}
+
+				std::cerr << "decoded: " << std::endl;
+				for(int x : res) {
+					std::cerr << x;
+				}
+				std::cerr << std::endl;
+				cnt = 0;
 			}
 		}
 	}

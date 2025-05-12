@@ -40,6 +40,16 @@ target_link_options(decode PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inl
 target_include_directories(decode PRIVATE src/)
 #target_include_directories(decode PUBLIC ../lib/)
 
+
+# Make noisy application
+add_executable(noisy noisy.cpp ${FIGURES_SOURCES})
+set_target_properties(noisy PROPERTIES RUNTIME_OUTPUT_DIRECTORY ../)
+#target_compile_features(noisy PRIVATE cxx_std_23)
+target_compile_options(noisy PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
+target_link_options(noisy PRIVATE -fsanitize=address -std=c++23 -g -O0 -fno-inline -Wall -Wextra)
+target_include_directories(noisy PRIVATE src/)
+#target_include_directories(noisy PUBLIC ../lib/)
+
 #SET(COVERAGE_FLAGS 
 #	--coverage
 #	-fprofile-arcs

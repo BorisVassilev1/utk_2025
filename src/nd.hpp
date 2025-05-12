@@ -1,16 +1,18 @@
 #pragma once
 
+#include <cstddef>
 #include <functional>
 #include <iomanip>
 #include <iostream>
+#include <iterator>
 #include <ostream>
 #include <tuple>
 
 #include <utils.hpp>
 
-template<class ...Args>
+template <class... Args>
 struct t : std::tuple<Args...> {
-	t(Args &&... args) : std::tuple<Args...>(std::forward<Args>(args)...) {}
+	t(Args &&...args) : std::tuple<Args...>(std::forward<Args>(args)...) {}
 };
 
 template <class... Args1, class... Args2>
@@ -98,6 +100,7 @@ template <class Container, class... Args>
 class ND {
    public:
 	using Internal = Container;
+
    protected:
 	std::tuple<Args...> dimensions;
 
@@ -254,9 +257,7 @@ class ND {
 		return apply([&v]<class T>(T &x) { return x * v; });
 	}
 
-	auto operator-() {
-		return apply(std::negate());
-	}
+	auto operator-() { return apply(std::negate()); }
 
 	template <class T>
 	ND<Container, Args...> &foreach (T &&f) {
@@ -323,4 +324,59 @@ class ND {
 		return This()[indices...];
 	}
 	auto slice(std::size_t i, std::size_t j) { return This().slice(i, j); }
+
+	template <class K>
+	class _Iterator {
+	   public:
+		_Iterator(ND &nd, std::size_t index) : nd(&nd), index(index) {}
+
+		using iterator_category = std::bidirectional_iterator_tag;
+		using difference_type	= std::ptrdiff_t;
+		using value_type		= int;
+		using pointer			= int *;
+		using reference			= int &;
+		using size_type			= size_t;
+
+		auto &operator*() { return (*nd)[index][]; }
+		auto  operator++() {
+			 ++index;
+			 return *this;
+		}
+		auto operator--() {
+			--index;
+			return *this;
+		}
+		auto operator++(int) {
+			auto tmp = *this;
+			++index;
+			return tmp;
+		}
+		auto operator--(int) {
+			auto tmp = *this;
+			--index;
+			return tmp;
+		}
+		auto &operator[](int i) { return (*nd)[index][i]; }
+
+		bool operator!=(const _Iterator &other) const { return index != other.index; }
+		bool operator==(const _Iterator &other) const { return index == other.index; }
+
+	   private:
+		K			nd;
+		std::size_t index;
+	};
+
+	using Iterator = _Iterator<ND *>;
+	// using ConstIterator = _Iterator<const ND *>;
+
+	Iterator begin()
+		requires(sizeof...(Args) == 1)
+	{
+		return Iterator(This(), 0);
+	}
+	Iterator end()
+		requires(sizeof...(Args) == 1)
+	{
+		return Iterator(This(), size());
+	}
 };
