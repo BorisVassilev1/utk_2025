@@ -11,7 +11,7 @@ class LinearCode {
 	mutable int	 d;
 
 	mutable bool r_computed = false;
-	mutable int	 r;
+	mutable int	 r = 0;
 
    public:
 	NDArray<int, int, int> generator;

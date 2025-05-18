@@ -19,9 +19,9 @@ class SindromeDecoder {
    public:
 	SindromeDecoder(LinearCode &code) : code(code) {
 		int dist = code.getDistance();
-		std::cerr << std::format("code distance is: [{}, {}, {}] \n r(C) = {}", code.length(), code.blockLength(), dist,
-								 code.getCoverageRadius())
+		std::cerr << std::format("initializing decodeer for [{}, {}, {}]-code", code.length(), code.blockLength(), dist)
 				  << std::endl;
+		// std::cerr << std::format("\n r(C) = {}", , code.getCoverageRadius()) << std::endl;
 
 		auto s0 = matmul_fancy(code.check, code.generator[0], type<int>);
 		s0.apply(mod2);
@@ -40,6 +40,7 @@ class SindromeDecoder {
 				sind[i] = s[i][0];
 			}
 		}
+		std::cerr << "initialization done" << std::endl;
 	}
 
 	auto decode(NDArray<int, int> &codeword) {
@@ -54,7 +55,7 @@ class SindromeDecoder {
 			if (entry.sindrome.operator==(sind)) {
 				codeword += entry.e;
 				codeword.apply(mod2);
-				
+
 				auto y = solve(code.generator, codeword);
 
 				return y;

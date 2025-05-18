@@ -104,6 +104,7 @@ int main() {
 		gaussSolve(H);
 		std::cout << "H =?= G : " << (H.operator==(G)) << std::endl;
 
+
 		{
 			auto [n, m, k] = codeInfo(G);
 			std::cout << "G: [" << n << ", " << m << ", " << k << "]" << std::endl;
@@ -112,6 +113,9 @@ int main() {
 		{
 			auto [n, m, k] = codeInfo(Slice(G, G.shape(), (_, P{0, 12}, P{0, 23})));
 			std::cout << "G*: [" << n << ", " << m << ", " << k << "]" << std::endl;
+
+			//std::ofstream os("codes/golay23.txt");
+			//Slice(G, G.shape(), (_, P{0, 12}, P{0, 23})).serialize(os);
 		}
 	}
 	{
